@@ -3,6 +3,7 @@ const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken');
 
+/*
 function authenticate(req, res, next){
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
@@ -12,25 +13,25 @@ function authenticate(req, res, next){
         req.user = user;
         next(); // đi tiếp
     });
-}
+}*/
 
 
-router.get('/bookingView', authenticate, orderController.viewOrder);
-router.post('/addloving', authenticate, orderController.SaveTolovingList);
-router.get('/loving', authenticate, orderController.viewLovingList);
-router.delete('/deleteloving', authenticate, orderController.DeleteLovingList);
-router.get('/destinations', authenticate, orderController.viewDestination);
-router.get('/:destination_id/destinationInfo', authenticate, orderController.viewDestination2);
-router.get('/:hotel_id/hotels', authenticate, orderController.viewHotels);
-router.post('/commenting', authenticate, orderController.addComment);
-router.put('/:booking_id/cancel_requested', authenticate, orderController.RequestcancelBooking);
-router.put('/:booking_id/cancel', authenticate, orderController.CancelBooking);
-router.post('/:ordering', authenticate, orderController.PlaceOrder);
-router.put('/profileEditing', authenticate, orderController.EditProfile);
-router.put('/editbooking', authenticate, orderController.EditBooking);
-router.get('/:type/browsing', authenticate, orderController.BrowseTypeBased);
-router.get('/browsing/:location', authenticate, orderController.BrowseLocationBased);
-router.get('/feebrowsing/:fee', authenticate, orderController.BrowseFeeBased);
+router.get('/bookingView',orderController.viewOrder);
+router.post('/addloving',orderController.SaveTolovingList);
+router.get('/loving',orderController.viewLovingList);
+router.delete('/deleteloving', orderController.DeleteLovingList);
+router.get('/destinations', orderController.viewDestination);
+router.get('/:destination_id/destinationInfo', orderController.viewDestination2);
+router.get('/:hotel_id/hotels', orderController.viewHotels);
+router.post('/commenting', orderController.addComment);
+router.put('/:booking_id/cancel_requested', orderController.RequestcancelBooking);
+router.put('/:booking_id/cancel', orderController.CancelBooking);
+router.post('/:ordering', orderController.PlaceOrder);
+router.put('/profileEditing', orderController.EditProfile);
+router.put('/editbooking', orderController.EditBooking);
+router.get('/:type/browsing', orderController.BrowseTypeBased);
+router.get('/browsing/:location', orderController.BrowseLocationBased);
+router.get('/feebrowsing/:fee', orderController.BrowseFeeBased);
 
 module.exports = router;
 
