@@ -29,4 +29,26 @@ class HotelModel {
             throw new Error('Không thể lấy danh sách khách sạn: ' + error.message);
         }
     }
+
+    static async updateHotelArround(hotel_id, destination_ids) {
+        const client = await pool.connect();
+        try {
+            await client.query('BEGIN');
+            await client.query('DELETE FROM HotelArround WHERE hotel_id = $1', [hotel_id]);
+            for (const destination_id of destination_ids) {
+                await client.query(
+                    'INSERT INTO HotelArround (hotel_id, destination_id) VALUES ($1, $2)',
+                    [hotel_id, destination_id]
+                );
+            }
+            await client.query('COMMIT');
+            return { success: true };
+        } catch (error) {
+            await client.query('ROLLBACK');
+            throw new Error('Không thể cập nhật HotelArround: ' + error.message);
+        } finally {
+            client.release();
+        }
+    }
 } 
+module.exports = HotelModel;

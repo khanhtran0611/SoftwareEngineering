@@ -1,5 +1,6 @@
 const pool = require('../config/db/index.js');
 const queries = require('../config/db/queries.js');
+const HotelModel = require('../models/hotel.model.js');
 
 class HotelController {
     async createHotel(req, res) {
@@ -45,6 +46,18 @@ class HotelController {
                 success: false,
                 message: 'Không thể lấy danh sách khách sạn: ' + error.message
             });
+        }
+    }
+    async updateHotelArround(req, res) {
+        const { hotel_id, destination_ids } = req.body;
+        if (!hotel_id || !Array.isArray(destination_ids)) {
+            return res.status(400).json({ message: 'Thiếu hotel_id hoặc destination_ids' });
+        }
+        try {
+            await HotelModel.updateHotelArround(hotel_id, destination_ids);
+            res.json({ message: 'Cập nhật HotelArround thành công' });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
         }
     }
 }
