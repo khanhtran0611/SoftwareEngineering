@@ -4,11 +4,14 @@ const app = express()
 const morgan = require('morgan')
 const route = require('./src/routes/index.js')
 const expressLayouts = require("express-ejs-layouts");
-const methodOverride = require('method-override')
+const multer = require('multer');
+const methodOverride = require('method-override');
+const cookieParser = require('cookie-parser');
 const port = 3000
 app.set('views','src\\views');
 app.set('view engine','ejs');
 app.use(morgan('combined'))
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname,'src/public/')))
 app.use(express.json())
 app.use(express.urlencoded({
@@ -19,5 +22,13 @@ app.use(express.urlencoded({
 // })
 
 app.use(methodOverride('_method'))
+
+const storage = multer.diskStorage({
+  destination: './img/',
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  }
+});
+const upload = multer({ storage });
 route(app)
 app.listen(port,()=>console.log(`Example app listening at path http://localhost:${port}`))
