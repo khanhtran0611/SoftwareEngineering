@@ -3,44 +3,113 @@ const router = express.Router()
 const AddHotelController = require('../controllers/AddHotelController')
 const jwt = require('jsonwebtoken');
 const multer = require('multer')
+const path = require('path');
+const fs = require('fs');
 
+// Đường dẫn lưu ảnh hotel
+const uploadPath = process.env.IMAGE_STORGAGE;
+
+// Cấu hình multer cho hotel images
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const dest = 'src\\public\\img';
-    cb(null, dest);
+    // Tạo folder nếu chưa tồn tại
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
-    const dest = 'public\\img';
-    const originalName = file.originalname;
-    const filePath = path.join(dest, originalName);
+    // Tách tên file và phần mở rộng
+    const nameWithoutExt = path.parse(file.originalname).name;
+    const ext = path.parse(file.originalname).ext;
+    let finalFileName = file.originalname;
+    let index = 1;
 
-    // ❗ Nếu file đã tồn tại, xóa nó
-    if (fs.existsSync(filePath)) {
-      console.log(`Đã tồn tại: ${filePath}, đang xóa...`);
-      fs.unlinkSync(filePath); // Xóa ảnh cũ
+    // Kiểm tra file đã tồn tại chưa
+    while (fs.existsSync(path.join(uploadPath, finalFileName))) {
+      finalFileName = `${nameWithoutExt}(${index})${ext}`;
+      index++;
     }
-    // ✅ Lưu file với đúng tên
-    cb(null, originalName);
+
+    cb(null, finalFileName);
   }
 });
-const upload = multer({ storage });
 
-function authenticate(req, res, next){
-    const token = req.cookies.access_token; // Bearer <token>
-    if (!token) return res.status(401).json({status : 4, message: 'Thiếu token' });
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if (err) return res.status(403).json({status : 4, message: 'Token không hợp lệ hoặc đã hết hạn' });
-        req.user = user;
-        next(); // đi tiếp
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Chỉ cho phép upload file ảnh!'), false);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // Giới hạn 5MB
+  }
+});
+
+// API upload ảnh hotel
+router.post('/upload-hotel-image', upload.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        status: 0,
+        message: 'Vui lòng chọn file ảnh để upload'
+      });
+    }
+
+    res.status(200).json({
+      status: 1,
+      message: 'Upload ảnh thành công',
+      originalName: req.file.originalname,
+      filename: '/' + req.file.filename
     });
-}
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({
+      status: 0,
+      message: 'Lỗi khi upload ảnh: ' + error.message
+    });
+  }
+});
 
-router.post('/add-hotel',authenticate,upload.single('thumbnail'), AddHotelController.AddNewHotel)
-router.delete('/hotels/:hotel_id',authenticate, AddHotelController.RemoveHotel)
-router.get('/hotels/:hotel_id',authenticate, AddHotelController.ViewHotelDetail)
-router.put('/hotels/:hotel_id',authenticate,upload.single('thumbnail'), AddHotelController.EditHotelInfo)
+// API xóa ảnh hotel
+router.delete('/delete-hotel-image/:filename', (req, res) => {
+  try {
+    const filename = req.params.filename;
+    const filepath = path.join(uploadPath, filename);
 
+    if (!fs.existsSync(filepath)) {
+      return res.status(200).json({
+        status: 0,
+        message: 'File không tồn tại'
+      });
+    }
 
-module.exports = router 
+    fs.unlinkSync(filepath);
+
+    res.status(200).json({
+      status: 1,
+      message: 'Xóa ảnh thành công'
+    });
+  } catch (error) {
+    console.error('Delete error:', error);
+    res.status(500).json({
+      status: 0,
+      message: 'Lỗi khi xóa ảnh: ' + error.message
+    });
+  }
+});
+
+router.post('/add-hotel', AddHotelController.AddNewHotel)
+router.delete('/hotels/:hotel_id', AddHotelController.RemoveHotel)
+router.get('/hotels/:hotel_id', AddHotelController.ViewHotelDetail)
+router.put('/edit-hotel/:hotel_id', AddHotelController.EditHotelInfo)
+router.get('/hotels', AddHotelController.ViewAllHotel)
+
+module.exports = router
 
 

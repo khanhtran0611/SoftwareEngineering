@@ -27,6 +27,21 @@ class BookingController {
        })
    }
 
+   ViewBooking(req,res){
+    pool.query(queries.ViewBooking, [req.params.user_id], (err,result)=>{
+        if(err){
+            return res.status(500).json({
+                status : 0, 
+                message: err.message 
+            });
+        }
+        // for(let i = 0; i < result.rows.length; i++){
+        //     result.rows[i].guest_name = result.rows[i].name;
+        // }
+        res.status(200).json({data :result.rows, status : 1});
+    });
+   }
+
 
     AcceptBooking(req, res) {
         Promise.resolve('success')

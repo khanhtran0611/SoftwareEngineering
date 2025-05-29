@@ -13,7 +13,7 @@ function route(app){
     app.use('/api', bookingRoutes)
     app.use('/customer',afterLogged)
     app.use('/',login)
-    app.use('/destinations', DestinationRoutes)
+    app.use('/destinations',DestinationRoutes)
 }
 
 module.exports = route;

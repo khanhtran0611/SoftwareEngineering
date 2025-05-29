@@ -38,10 +38,12 @@ class HotelController {
 
     async getAllHotels(req, res) {
         try {
-            let user_id = req.user.user_id
+            let user_id = req.params.user_id
+            console.log(user_id)
             const result = await pool.query(queries.getAllHotels,[user_id]);
             
             return res.status(200).json({
+                status : 1,
                 success: true,
                 message: 'Lấy danh sách khách sạn thành công',
                 data: result.rows
@@ -99,6 +101,14 @@ class HotelController {
             if(err){
                 return res.status(500).json({status : 0,message : err.message})
             }
+            for(let i = 0; i < result.rows.length; i++){
+                const {facility_id,name,description} = result.rows[i]
+                result.rows[i] = {
+                    facility : {facility_id,name},
+                    description : description
+                }
+                console.log(result.rows[i])
+            }
             return res.status(200).json({status : 1,data : result.rows})
         })
     }
@@ -122,6 +132,7 @@ class HotelController {
             return res.status(200).json({status : 1,data : result.rows})
         })
     }
+    
     
 
 

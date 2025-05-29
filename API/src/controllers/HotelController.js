@@ -36,7 +36,7 @@ class HotelController{
 
     // View all hotel information for customers
     async viewHotels(req,res){
-        let hotel_id = req.query.hotel_id;
+        let hotel_id = req.params.hotel_id;
         let result = await pool.query(queries.viewHotelInfo,[hotel_id])
         let hotel = result.rows[0]
         let room = await ListofRooms(hotel_id)
@@ -53,6 +53,8 @@ class HotelController{
     }
 
 
+
+
         // viewRoomInfo(){
     //      let room_id = req.params.room_id
     //      pool.query(queries.ViewRoomInfo,[room_id],(err,result)=>{
@@ -67,14 +69,14 @@ class HotelController{
 
 
     async addComment(req,res){
-        let user_id = req.user.user_id;
-        let rating = 0;
-        let result = await pool.query(queries.getHotelRating,[hotel_id]);
-        let objs = result.rows
-        for(const obj of objs){
-           rating += obj.rating;
-        }
-        rating = rating*1.0 / objs.length 
+        let user_id = req.body.user_id;
+        let rating = req.body.rating;
+        // let result = await pool.query(queries.getHotelRating,[hotel_id]);
+        // let objs = result.rows
+        // for(const obj of objs){
+        //    rating += obj.rating;
+        // }
+        // rating = rating*1.0 / objs.length 
         Promise.resolve('success')
         .then(()=>{
            console.log(req.body)
@@ -90,10 +92,21 @@ class HotelController{
                    console.error('Query error:', err);     
                    return res.status(500).json({status : 0, message: err.message });
                  }
-               res.status(200).json({status : 1, message: 'Thành công!' });
+               res.status(200).json({status : 1, message: 'Thành công!', data: result.rows[0] });
            })
         })
    }
+
+   async checkHotelReview(req,res){
+    let user_id = req.params.user_id
+    let hotel_id = req.params.hotel_id
+    pool.query(queries.CheckHotelReview,[user_id,hotel_id],(err,result)=>{
+        if(err){
+            return res.status(500).json({status : 0, message : err.message})
+        }   
+        return res.status(200).json({status : 1, data : result.rows})
+    })
+   }    
 }
 
 module.exports = new HotelController();

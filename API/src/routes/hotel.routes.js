@@ -17,22 +17,28 @@ function authenticate(req, res, next){
     });
 }
 // Route để tạo khách sạn mới
-router.post('/',authenticate, hotelController.createHotel);
+// router.post('/', hotelController.createHotel);
 
-// Route để lấy danh sách khách sạn
-router.get('/',authenticate, hotelController.getAllHotels);
+// // Route để lấy danh sách khách sạn
+router.get('/owner/:user_id',hotelController.getAllHotels);
 
 // ... existing code ...
-router.put('/arround',authenticate, hotelController.updateHotelArround);
-router.put('/facility',authenticate,hotelController.updateHotelFacilities);
-router.put('/service',authenticate,hotelController.updateRoomService);
-router.get('/hotel-facilities/:hotel_id',authenticate,hotelController.getHotelFacilities)      // for hotel owner
-router.get('/room-services/:room_id',authenticate,hotelController.getRoomServices)         // for hotel owner
-router.get('/nearby/:hotel_id',authenticate,hotelController.getNearbyDestination)          // for hotel owne
+router.put('/arround',hotelController.updateHotelArround);
+router.put('/facility',hotelController.updateHotelFacilities);
+router.put('/service',hotelController.updateRoomService);
+router.get('/hotel-facilities/:hotel_id',hotelController.getHotelFacilities)      // for hotel owner
+router.get('/room-services/:room_id',hotelController.getRoomServices)         // for hotel owner
+router.get('/nearby/:hotel_id',hotelController.getNearbyDestination)    
+router.get('/allfacilities',serviceController.getAllFacilities)      // for hotel owne
+router.get('/allservices',serviceController.getAllServices)  // for hotel owner
 
-router.put('/facility-edit',authenticate,serviceController.UpdateFacility);
-router.get('/facility',authenticate,serviceController.ViewFacility);
-router.put('/service-edit',authenticate,serviceController.UpdateService);
-router.get('/service',authenticate,serviceController.ViewService);
+
+router.post('/facility-add',serviceController.AddFacility);
+router.put('/facility-edit',serviceController.UpdateFacility);
+router.get('/facilities/:hotel_id',serviceController.ViewFacility);
+router.delete('/facility-delete/:hotel_id/:facility_id',serviceController.DeleteFacility);
+router.post('/service-add',serviceController.AddService);
+router.get('/services/:room_id',serviceController.ViewService);
+router.delete('/service-delete/:room_id/:service_id',serviceController.DeleteService);
 
 module.exports = router; 

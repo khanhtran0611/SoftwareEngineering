@@ -1,6 +1,20 @@
 const pool = require('../config/db/index.js')
 const queries = require('../config/db/queries.js')
 const HotelModel = require('../models/hotel.model.js');
+
+
+
+function getRole(user_id){
+    pool.query(queries.RoleExtract,[user_id],(err,result)=>{
+        if(err){
+            console.error('Query error:', err);
+            return res.status(500).json({ error: 'Không thể lấy thông tin khách sạn: ' + err.message });
+        }
+    });
+
+ }
+
+
 class AddHotelController {
     calculateDistance(lat1, lon1, lat2, lon2) {
     const R = 6371; // Radius of the Earth in kilometers
@@ -34,70 +48,79 @@ class AddHotelController {
     }
 }
 
-    async getRole(user_id){
-       let result = await pool.query(queries.RoleExtract,[user_id]);
-       return result.rows[0];
-    }
+
 
     AddNewHotel(req, res) {
-        Promise.resolve('success')
-        .then(() => {
-            let user_id = req.user.user_id
-            const { name, address, rating, longitude, latitude, description,contact_phone } = req.body;
-            thumbnail = req.file.originalname
-
-            if(this.getRole(user_id) != 'hotel owner'){
-                return res.status(400).json({ 
-                    status : 2,
-                    error: 'Only hotel owner can add a hotel' 
-                });
-            }
-
+        try {
+            console.log(100)
+            console.log(req.body)
+            const user_id = req.body.hotel_owner;
+            const contact_phone = req.body.contact_phone;
+            const thumbnail = req.body.thumbnail;
+            const name = req.body.name;
+            const address = req.body.address;
+            let rating = 0;
+            const longitude = req.body.longitude;
+            const latitude = req.body.latitude;
+            const description = req.body.description;
+            
+            console.log(user_id)
+            // if (getRole(user_id) !== 'hotel owner') {
+            //     return res.status(400).json({
+            //         status: 2,
+            //         error: 'Only hotel owner can add a hotel'
+            //     });
+            // }
             // Validate dữ liệu đầu vào
-            if (!name || !address || !rating || !longitude || !latitude || !description) {
-                return res.status(400).json({ 
-                    status : 2,
-                    error: 'Vui lòng điền đầy đủ thông tin khách sạn' 
+            if (!name || !address || rating === undefined || longitude === undefined || latitude === undefined || !description) {
+                return res.status(400).json({
+                    status: 2,
+                    error: 'Vui lòng điền đầy đủ thông tin khách sạn'
                 });
             }
-
             // Validate kiểu dữ liệu
             if (typeof rating !== 'number' || rating < 0 || rating > 5) {
-                return res.status(400).json({ 
-                    status : 2,
-                    error: 'Rating phải là số từ 0 đến 5' 
+                return res.status(400).json({
+                    status: 2,
+                    error: 'Rating phải là số từ 0 đến 5'
                 });
             }
-
+    
             if (typeof longitude !== 'number' || typeof latitude !== 'number') {
-                return res.status(400).json({ 
-                    status : 2,
-                    error: 'Longitude và latitude phải là số' 
+                return res.status(400).json({
+                    status: 2,
+                    error: 'Longitude và latitude phải là số'
                 });
             }
-
-            const values = [name, address, rating, longitude, latitude, description, thumbnail,contact_phone,user_id];
-            return values;
-        })
-        .then((values) => {
-            rating = 0;
+    
+            const values = [
+                name || null, 
+                address || null, 
+                rating || 0, 
+                longitude || 0, 
+                latitude || 0, 
+                description || null, 
+                thumbnail || null, 
+                contact_phone || null, 
+                user_id || 0];
+            // Query DB
             pool.query(queries.createHotel, values, (err, result) => {
                 if (err) {
                     console.error('Query error:', err);
                     return res.status(500).json({ error: 'Không thể thêm khách sạn: ' + err.message });
                 }
-                findNearbyHotels(hotel_id,values[4],values[3]);
-                res.status(201).json({ 
-                    status : 1,
+    
+                res.status(201).json({
+                    status: 1,
                     message: 'Thêm khách sạn thành công!',
                     data: result.rows[0]
                 });
             });
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            res.status(500).json({status : 0, message: error.message });
-        });
+    
+        } catch (error) {
+            console.error('Unhandled Error:', error);
+            res.status(500).json({ status: 0, message: error.message });
+        }
     }
 
     
@@ -199,9 +222,15 @@ class AddHotelController {
         Promise.resolve('success')
         .then(() => {
             const hotel_id = req.params.hotel_id;
-            const { name, address, rating, longitude, latitude, description, contact_phone } = req.body;
-            thumbnail = req.file
-
+            // const { name, address, rating, longitude, latitude, description, contact_phone } = req.body;
+            let thumbnail = req.body.thumbnail
+            let name = req.body.name
+            let address = req.body.address
+            let rating = req.body.rating
+            let longitude = req.body.longitude
+            let latitude = req.body.latitude
+            let description = req.body.description
+            let contact_phone = req.body.contact_phone
             // Kiểm tra xem có hotel_id không
             if (!hotel_id) {
                 return res.status(400).json({ 
@@ -209,51 +238,51 @@ class AddHotelController {
                     message: 'Vui lòng cung cấp ID khách sạn' 
                 });
             }
+            
+            // // Kiểm tra xem có thông tin nào được cung cấp để cập nhật không
+            // if (!name && !address && !rating && !longitude && !latitude && !description && !thumbnail && !contact_phone) {
+            //     return res.status(400).json({ 
+            //         status : 2,
+            //         message: 'Vui lòng cung cấp ít nhất một thông tin để cập nhật' 
+            //     });
+            // }
 
-            // Kiểm tra xem có thông tin nào được cung cấp để cập nhật không
-            if (!name && !address && !rating && !longitude && !latitude && !description && !thumbnail && !contact_phone) {
-                return res.status(400).json({ 
-                    status : 2,
-                    message: 'Vui lòng cung cấp ít nhất một thông tin để cập nhật' 
-                });
-            }
+            // // Validate dữ liệu nếu được cung cấp
+            // if (rating !== undefined) {
+            //     if (typeof rating !== 'number' || rating < 0 || rating > 5) {
+            //         return res.status(400).json({ 
+            //             status : 2,
+            //             message: 'Rating phải là số từ 0 đến 5' 
+            //         });
+            //     }
+            // }
 
-            // Validate dữ liệu nếu được cung cấp
-            if (rating !== undefined) {
-                if (typeof rating !== 'number' || rating < 0 || rating > 5) {
-                    return res.status(400).json({ 
-                        status : 2,
-                        message: 'Rating phải là số từ 0 đến 5' 
-                    });
-                }
-            }
+            // if (longitude !== undefined && typeof longitude !== 'number') {
+            //     return res.status(400).json({ 
+            //         status : 2,
+            //         message: 'Longitude phải là số' 
+            //     });
+            // }
 
-            if (longitude !== undefined && typeof longitude !== 'number') {
-                return res.status(400).json({ 
-                    status : 2,
-                    message: 'Longitude phải là số' 
-                });
-            }
-
-            if (latitude !== undefined && typeof latitude !== 'number') {
-                return res.status(400).json({ 
-                    status : 2,
-                    message: 'Latitude phải là số' 
-                });
-            }
+            // if (latitude !== undefined && typeof latitude !== 'number') {
+            //     return res.status(400).json({ 
+            //         status : 2,
+            //         message: 'Latitude phải là số' 
+            //     });
+            // }
 
             const values = [
                 hotel_id,
                 name || null,
                 address || null,
-                rating || null,
-                longitude || null,
-                latitude || null,
+                rating || 0,
+                longitude || 0,
+                latitude || 0,
                 description || null,
                 thumbnail || null,
                 contact_phone || null
             ];
-
+            console.log(values)
             return values;
         })
         .then((values) => {
@@ -278,6 +307,14 @@ class AddHotelController {
             console.error('Error:', error);
             res.status(500).json({status: 1,  message: error.message });
         });
+    }
+    async ViewAllHotel(req, res) {
+        try {
+            const result = await pool.query(queries.getFullHotels);
+            res.status(200).json({status: 1, message: 'Lấy danh sách khách sạn thành công!', data: result.rows});
+        } catch (error) {
+            res.status(500).json({status: 0, message: error.message});
+        }
     }
 }
 

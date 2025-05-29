@@ -4,33 +4,92 @@ const viewDestination = "SELECT destination_id,name,rating,location,description,
 const viewDestinationAll = "SELECT * FROM Destination where destination_id = $1;"
 const viewHotel = "SELECT h.hotel_id,h.name,h.rating,h.description FROM Hotel h JOIN HotelNearby ha ON h.hotel_id = ha.hotel_id JOIN Destination d ON ha.destination_id = d.destination_id WHERE d.destination_id = $1;"
 const viewHotelInfo = "SELECT * FROM Hotel WHERE hotel_id = $1;"
-const addComment = "INSERT INTO Review (user_id, hotel_id, rating, comment, date_created) VALUES ($1, $2, $3, $4, NOW());"
+const addComment = "INSERT INTO Review (user_id, hotel_id, rating, comment, date_created) VALUES ($1, $2, $3, $4, NOW()) RETURNING *;"
 const addDestinationComment = "INSERT INTO DesReview (user_id, destination_id, rating, comment, date_created) VALUES ($1, $2, $3, $4, NOW());"
-const RequestcancelBooking = "UPDATE Booking SET status = 'Cancel_Requested' WHERE booking_id = $1;"
-const CancelBooking = "UPDATE Booking SET status = 'Cancelled' WHERE booking_id = $1; "
-const BookingRoom = "INSERT INTO Booking (user_id, room_id, status, total_price, check_in_date, check_out_date,peoples) VALUES ($1, $2, 'Pending', $3, $4, $5,$6);"
+const BookingStatusChange = "UPDATE Booking SET status = $2 WHERE booking_id = $1 RETURNING *;"
+const CancelBooking = "UPDATE Booking SET status = 'cancelled' WHERE booking_id = $1; "
+const BookingRoom = "INSERT INTO Booking (user_id, room_id, status, total_price, check_in_date, check_out_date,people) VALUES ($1, $2, 'pending', $3, $4, $5,$6) RETURNING *;"
 const viewProfile = "SELECT * FROM \"User\" WHERE user_id = $1;"
 const viewComment = "SELECT * FROM Review WHERE hotel_id = $1";
 const ViewDestinationComment = "SELECT * FROM DesReview WHERE destination_id = $1";
-const editProfile = "UPDATE \"User\" SET name = $1, email = $2, phone_number = $3, gender = $4, date_of_birth = $5, password = $6 WHERE user_id = $7;"
+const editProfile = "UPDATE \"User\" SET name = $1, email = $2, phone_number = $3, gender = $4, date_of_birth = $5, profile_image = $6 WHERE user_id = $7 RETURNING *;"
 const PriceExtract = "SELECT price_per_night FROM Room WHERE room_id = $1;"
-const editBooking = "UPDATE Booking SET room_id = $2, total_price = $3, check_in_date = $4, check_out_date = $5, status = $6, peoples = $7 WHERE booking_id = $1;"
+const editBooking = "UPDATE Booking SET room_id = $2, total_price = $3, check_in_date = $4, check_out_date = $5, status = $6, people = $7 WHERE booking_id = $1 RETURNING *;"
 const signin = "INSERT INTO \"User\" (name, email, phone_number, gender, date_of_birth, role, password) VALUES ($1, $2, $3, $4, $5, 'customer', $6);"
 const AddLovingList = "INSERT INTO LovingList (user_id, destination_id) VALUES ($1, $2);"
 const DeleteLovingList = "DELETE FROM LovingList WHERE user_id = $1 AND destination_id = $2;"
-const ViewLovingList = "SELECT d.* FROM LovingList l JOIN Destination d ON l.destination_id = d.destination_id WHERE l.user_id = $1;"
+const ViewLovingList = "SELECT d.destination_id FROM LovingList l JOIN Destination d ON l.destination_id = d.destination_id WHERE l.user_id = $1;"
 const DestinationImage = "SELECT image_url from Image where destination_id = $1;"
 const TypeBrowse = "SELECT * FROM destination WHERE type = $1;"
 const LocationBrowse = "SELECT * FROM destination WHERE location = $1;"
 const FeeBrowse = "SELECT * FROM destination WHERE entry_fee BETWEEN $1 AND $2;"
 const ViewRoomInfo = "SELECT * FROM Room WHERE room_id = $1;"
 const ViewHotelRooms = "SELECT * FROM Room WHERE hotel_id = $1;"
-const login = "SELECT user_id,name,profile_image FROM \"User\" WHERE email = $1 AND password = $2;"
+const login = "SELECT * FROM \"User\" WHERE email = $1 AND password = $2;"
 const ListofFacilities = "SELECT f.facility_id, f.name, fp.description FROM FacilitiesPossessing fp JOIN HotelFacilities f ON fp.facility_id = f.facility_id WHERE fp.hotel_id = $1;"
 const ListofServices = "SELECT s.service_id, s.name FROM ServicePossessing sp JOIN RoomService s ON sp.service_id = s.service_id WHERE sp.room_id = $1;"
-const createHotel = "INSERT INTO Hotel (name, address, rating, longitude, latitude, description, thumbnail,contact_phone,user_id) VALUES ($1, $2, $3, $4, $5, $6, $7,$8) RETURNING *;"
+const createHotel = "INSERT INTO Hotel (name, address, rating, longitude, latitude, description, thumbnail,contact_phone,user_id) VALUES ($1, $2, $3, $4, $5, $6, $7,$8,$9) RETURNING *;"
+const ViewBooking = "SELECT b.*,u.name as guest_name,h.name as hotel_name,r.name as room_name FROM Hotel h JOIN Room r ON (h.hotel_id = r.hotel_id) JOIN booking b ON (r.room_id = b.room_id) JOIN \"User\" u ON (b.user_id = u.user_id) WHERE h.user_id = $1;"
 const getAllHotels = "SELECT * FROM Hotel WHERE user_id = $1;"
+const getHotelForRoom = `
+    SELECT h.*
+    FROM Hotel h
+    JOIN Room r ON h.hotel_id = r.hotel_id
+    WHERE r.room_id = $1;
+`
+
+const UpdateFacility = `
+    UPDATE FacilitiesPossessing
+    SET description = $3
+    WHERE facility_id = $1 AND hotel_id = $2
+    RETURNING *;
+`
+const DeleteFacility = `
+    DELETE FROM FacilitiesPossessing
+    WHERE facility_id = $1 AND hotel_id = $2
+    RETURNING *;
+`
+
+const DeleteService = `
+    DELETE FROM ServicePossessing
+    WHERE service_id = $1 AND room_id = $2
+    RETURNING *;
+`
+
 const removeHotel = "DELETE FROM Hotel WHERE hotel_id = $1 RETURNING *;"
+
+const removeRoom = "DELETE FROM Room WHERE room_id = $1 RETURNING *;"
+
+const getDestinationComment= `
+   SELECT * FROM Review WHERE destination_id = $1;
+`
+const editDestinationComment = `
+  UPDATE DesReview 
+  SET rating = $2, comment = $3, date_created = NOW()
+  WHERE user_id = $1 AND destination_id = $2
+  RETURNING *;
+`
+
+const deleteDestinationComment = `
+  DELETE FROM DesReview WHERE user_id = $1 AND destination_id = $2
+  RETURNING *;
+`
+
+const CheckHotelReview = `
+    SELECT * FROM Review WHERE user_id = $1 AND hotel_id = $2;
+`
+
+const Browse = `
+  SELECT * FROM destination 
+  WHERE name LIKE '%' || $1 || '%' 
+    AND entry_fee BETWEEN $2 AND $3 
+    AND location LIKE '%' || $4 || '%';
+`;
+
+const CheckLovingList = `
+  SELECT * FROM LovingList WHERE user_id = $1 AND destination_id = $2;
+`
+
 const getHotelDetail = `
     SELECT h.*, 
            ARRAY_AGG(DISTINCT r.room_id || ',' || r.name || ',' || r.type || ',' || COALESCE(r.thumbnail, '')  || ',' || r.price_per_night::text) as rooms,
@@ -42,16 +101,20 @@ const getHotelDetail = `
     WHERE h.hotel_id = $1
     GROUP BY h.hotel_id;
 `
+
+const viewBookingDetail = `
+    SELECT * FROM Booking WHERE booking_id = $1;
+`
 const updateHotel = `
     UPDATE Hotel 
-    SET name = COALESCE($2, name),
-        address = COALESCE($3, address),
-        rating = COALESCE($4, rating),
-        longitude = COALESCE($5, longitude),
-        latitude = COALESCE($6, latitude),
-        description = COALESCE($7, description),
-        thumbnail = COALESCE($8, thumbnail),
-        contact_phone = COALESCE($9, contact_phone)
+    SET name = $2,
+        address = $3,
+        rating = $4,
+        longitude = $5,
+        latitude = $6,
+        description = $7,
+        thumbnail = $8,
+        contact_phone = $9
     WHERE hotel_id = $1
     RETURNING *;
 `
@@ -65,14 +128,14 @@ const addRoom = `
 
 const updateRoom = `
     UPDATE Room 
-    SET name = COALESCE($2, name),
-        type = COALESCE($3, type),
-        location = COALESCE($4, location),
-        availability = COALESCE($5, availability),
-        max_guests = COALESCE($6, max_guests),
-        price_per_night = COALESCE($7, price_per_night),
-        description = COALESCE($8, description),
-        thumbnail = COALESCE($9, thumbnail)
+    SET name = $2,
+        type = $3,
+        location = $4,
+        availability = $5,
+        max_guests = $6,
+        price_per_night = $7,
+        description = $8,
+        thumbnail = $9
     WHERE room_id = $1
     RETURNING *;
 `
@@ -124,8 +187,8 @@ const acceptBooking = `
 
 const rejectBooking = `
     UPDATE Booking 
-    SET status = 'Rejected'
-    WHERE booking_id = $1 AND status = 'Pending'
+    SET status = 'rejected'
+    WHERE booking_id = $1 AND status = 'pending'
     RETURNING *;
 `
 
@@ -135,22 +198,22 @@ const addDestination = `
         name, rating, location, transportation, 
         entry_fee, description, latitude, longitude,type,
         thumbnail
-    ) VALUES ($1, $2, $3, $4, CAST($5 AS MONEY), $6, $7, $8, $9,$10)
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,$10)
     RETURNING *;
 `
 
 const updateDestination = `
     UPDATE Destination 
-    SET name = COALESCE($2, name),
-        rating = COALESCE($3, rating),
-        location = COALESCE($4, location),
-        transportation = COALESCE($5, transportation),
-        entry_fee = COALESCE($6, entry_fee),
-        description = COALESCE($7, description),
-        latitude = COALESCE($8, latitude),
-        longitude = COALESCE($9, longitude),
-        thumbnail = COALESCE($10, thumbnail),
-        type = COALESCE($11, type)
+    SET name = $2,
+        rating = $3,
+        location = $4,
+        transportation = $5,
+        entry_fee = $6,
+        description = $7,
+        latitude = $8,
+        longitude = $9,
+        thumbnail = $10,
+        type = $11
     WHERE destination_id = $1
     RETURNING *;
 `
@@ -161,38 +224,50 @@ const deleteDestination = `
     RETURNING *;
 `
 
+// SELECT d.*,
+// ARRAY_AGG(DISTINCT i.image_url) as images,
+// ARRAY_AGG(DISTINCT h.hotel_id || ',' || h.name || ',' || h.rating) as nearby_hotels
+// FROM Destination d
+// LEFT JOIN Image i ON d.destination_id = i.destination_id
+// LEFT JOIN Hotelnearby ha ON d.destination_id = ha.destination_id
+// LEFT JOIN Hotel h ON ha.hotel_id = h.hotel_id
+// WHERE d.destination_id = $1
+// GROUP BY d.destination_id;
 const getDestinationDetail = `
-    SELECT d.*,
-           ARRAY_AGG(DISTINCT i.image_url) as images,
-           ARRAY_AGG(DISTINCT h.hotel_id || ',' || h.name || ',' || h.rating) as nearby_hotels
-    FROM Destination d
-    LEFT JOIN Image i ON d.destination_id = i.destination_id
-    LEFT JOIN Hotelnearby ha ON d.destination_id = ha.destination_id
-    LEFT JOIN Hotel h ON ha.hotel_id = h.hotel_id
-    WHERE d.destination_id = $1
-    GROUP BY d.destination_id;
+   SELECT * FROM Destination WHERE destination_id = $1;
 `
 
+//    (SELECT COUNT(*) FROM LovingList l WHERE l.destination_id = d.destination_id) as favorite_count
+//     ORDER BY d.destination_id;
 const getAllDestinations = `
-    SELECT d.*,
-           (SELECT COUNT(*) FROM LovingList l WHERE l.destination_id = d.destination_id) as favorite_count
-    FROM Destination d
-    ORDER BY d.destination_id;
+    SELECT *
+    FROM Destination d;
 `
 
 const getNearbyDestination = `
     SELECT * FROM HotelArround WHERE hotel_id = $1;
 `
 
+const getHotelByUserId = `
+    SELECT * FROM Hotel WHERE user_id = $1;
+`
+
 const addDestinationImage = `
     INSERT INTO Image (destination_id, image_url)
-    VALUES ($1::integer, $2)
+    VALUES ($1, $2)
     RETURNING *;
 `
 
 const removeDestinationImage = `
     DELETE FROM Image 
-    WHERE destination_id = $1 AND image_url = $2
+    WHERE image_id = $1
+    RETURNING *;
+`
+
+const updateDestinationImage = `
+    UPDATE Image 
+    SET image_url = $2
+    WHERE image_id = $1
     RETURNING *;
 `
 
@@ -218,10 +293,12 @@ const insertFacility = `
     INSERT INTO hotelfacilities VALUES($1,$2); 
 `
 const viewfacility = `
-    SELECT * FROM hotelfacilities;  
+    SELECT * FROM FacilitiesPossessing WHERE hotel_id = $1;  
 `
 const getHotelFacilities = `
-    SELECT * FROM facilitiespossessing WHERE hotel_id = $1;
+    SELECT hf.facility_id,hf.name,fp.description 
+    FROM facilitiespossessing fp JOIN HotelFacilities hf ON fp.facility_id = hf.facility_id 
+    WHERE fp.hotel_id = $1;
 `
 
 const insertService = `
@@ -230,11 +307,13 @@ const insertService = `
 `
 
 const viewService = `
-    SELECT * FROM RoomService;
+    SELECT * FROM ServicePossessing WHERE room_id = $1;
 `
 
 const getRoomServices = `
-    SELECT * FROM Servicepossessing WHERE room_id = $1;
+    SELECT s.service_id,s.name 
+    FROM Servicepossessing sp JOIN RoomService s ON sp.service_id = s.service_id 
+    WHERE sp.room_id = $1;
 `
 
 const getRoomStatus = `
@@ -256,22 +335,68 @@ const getDestinationRating = `
     SELECT rating FROM DesReview WHERE destination_id = $1;
 `
 
+const getRoomDetail = `
+    SELECT * FROM Room WHERE room_id = $1;
+`
+//  dr.rating, dr.comment, dr.date_created
+const getUserFromDestinationReview = `
+SELECT u.user_id, u.name, u.email, u.profile_image, u.role
+FROM DesReview dr
+JOIN "User" u ON dr.user_id = u.user_id
+WHERE dr.destination_id = $1
+ORDER BY dr.date_created DESC
+`;
+
+const getFullHotels = `
+    SELECT * FROM Hotel;
+`
+
+const checkDestinationReview = `
+    SELECT * FROM DesReview WHERE user_id = $1 AND destination_id = $2;
+`
+const getRoomListFromRoomId = `
+    SELECT * FROM Room 
+    WHERE hotel_id IN (SELECT hotel_id FROM room r2 WHERE r2.room_id = $1);
+`
+
+const getAllFacilities = `
+    SELECT * FROM HotelFacilities;
+`
+
+const getAllServices = `
+    SELECT * FROM RoomService;
+`
+
+const updateRoomStatus = `
+    UPDATE Room 
+    SET availability = $2
+    WHERE room_id = $1
+    RETURNING *;
+`
+
 module.exports = {
     viewOrderHistory,
+    getUserFromDestinationReview,
+    checkDestinationReview,
     viewDestination,
     viewDestinationAll,
     viewHotel,
     addComment,
-    RequestcancelBooking,
+    UpdateFacility,
+    BookingStatusChange,
     CancelBooking,
     BookingRoom,
+    removeRoom,
     RoleExtract,
     viewComment,
+    getDestinationComment,
     editProfile,
     viewProfile,
     PriceExtract,
     editBooking,
     signin,
+    DeleteFacility,
+    DeleteService,
     AddLovingList,
     DeleteLovingList,
     ViewLovingList,
@@ -279,17 +404,25 @@ module.exports = {
     TypeBrowse,
     LocationBrowse,
     FeeBrowse,
+    Browse,
+    editDestinationComment,
+    deleteDestinationComment,
     viewHotelInfo,
     ViewRoomInfo,
+    getHotelByUserId,
     ViewHotelRooms,
+    getRoomListFromRoomId,
     login,
     createHotel,
+    CheckLovingList,
     getAllHotels,
+    ViewBooking,
     removeHotel,
     getHotelDetail,
     updateHotel,
     addRoom,
     addDestinationComment,
+    CheckHotelReview,
     updateRoom,
     getRoomById,
     getBookingDetail,
@@ -323,5 +456,13 @@ module.exports = {
     getNearbyDestination,
     getDestinationImages,
     getDestinationLocation,
-    ViewDestinationComment
+    ViewDestinationComment,
+    viewBookingDetail,
+    getRoomDetail,
+    getFullHotels,
+    getHotelForRoom,
+    getAllFacilities,
+    getAllServices,
+    updateDestinationImage,
+    updateRoomStatus
 }
