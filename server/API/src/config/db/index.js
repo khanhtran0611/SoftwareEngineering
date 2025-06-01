@@ -2,8 +2,8 @@ const Pool = require('pg').Pool;
 const pool = new Pool({
     user:"postgres",
     host:"localhost",
-    database: "se_en",
-    password:"admin",
+    database: "backup",
+    password:"Dang12c6",
     port : 5432,
     max: 10,         // số kết nối tối đa trong pool
     idleTimeoutMillis: 30000, // timeout khi không dùng

@@ -95,6 +95,7 @@ class RecSysMain:
         self.data = Dataset.load_from_file(self.ratings_path, reader=self.reader)
         self.algo = RBMAlgorithm(epochs=20, hiddenDim=10, learningRate=0.01, batchSize=10)
 
+
     def train_and_save(self):
         trainset = self.data.build_full_trainset()
         self.algo.fit(trainset)

@@ -77,6 +77,27 @@ def export_review_user_hotel_rating(filename):
     cur.close()
     conn.close()
 
-if __name__ == "__main__":
-    export_hotel_room_facilities_to_csv('./dataset/hotel_room_facilities.csv')
-    #export_review_user_hotel_rating('./dataset/ratings.csv')
+def export_review_user_destination_rating(filename):
+    """
+    Export user_id, destination_id, rating from destination_review table to CSV.
+
+    Args:
+        filename (str): Output CSV file path.
+    """
+    query = """
+    SELECT user_id, destination_id, rating
+    FROM destinatiion_review
+    ORDER BY user_id, hotel_id
+    """
+    conn = psycopg2.connect(**db_config)
+    cur = conn.cursor()
+    cur.execute(query)
+    rows = cur.fetchall()
+    with open(filename, mode='w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['user_id', 'destination_id', 'rating'])
+        for row in rows:
+            writer.writerow(row)
+    cur.close()
+    conn.close()
+
