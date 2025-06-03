@@ -61,7 +61,7 @@ class RecSysNCF:
 
     def evaluate(self, n=10):
         """
-        Evaluate the NCF model using metrics similar to bakeRBM.py.
+        Evaluate the NCF model .
         """
         train_df = self.df.sample(frac=0.75, random_state=1)
         test_df = self.df.drop(train_df.index)

@@ -144,4 +144,6 @@ router.post('/create-destination-image', DestinationController.AddDestinationIma
 router.delete('/delete-destination-image-db/:images_id', DestinationController.DeleteDestinationImage)
 router.put('/update-destination-image-db/:images_id', DestinationController.UpdateDestinationImage)
 
+router.post('/destination_rec/', DestinationController.GetRecommendedDestinations)
+
 module.exports = router 
