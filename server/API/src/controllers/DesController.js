@@ -173,48 +173,6 @@ class DesController {
       })
    }
 
-   async recommendDestinations(req, res) {
-      try {
-         const { user_id } = req.body;
-
-         // Validate user_id
-         if (!user_id) {
-               return res.status(400).json({
-                  status: 0,
-                  message: "Missing user_id in request body",
-               });
-         }
-
-         // Call Flask API to get recommended destinations
-         const response = await axios.post("http://localhost:5002/destination/recommend", {
-               user_id,
-         });
-
-         const recommendedDestinationIds = response.data; // Array of destination IDs
-
-         // Fetch detailed information for each recommended destination
-         const destinations = await Promise.all(
-               recommendedDestinationIds.map(async (destination_id) => {
-                  const result = await pool.query(queries.getDestinationDetail, [destination_id]);
-                  return result.rows[0];
-               })
-         );
-
-         return res.status(200).json({
-               status: 1,
-               message: "Recommended destinations fetched successfully",
-               data: destinations,
-         });
-      } catch (error) {
-         console.error("Error recommending destinations:", error);
-         return res.status(500).json({
-               status: 0,
-               message: "Failed to fetch recommended destinations: " + error.message,
-         });
-      }
-   }
-
-
 }
 
-module.exports = new DestinationController();
+module.exports = new DesController();
