@@ -17,6 +17,7 @@ import { useState, useEffect } from "react"
 import type { Hotel } from "@/types/hotel"
 import type { DestinationImage } from "@/types/image"
 import { getAllHotels } from "@/lib/hotel"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 type DestinationDetailsProps = {
   destination: Destination
@@ -28,7 +29,7 @@ export default function DestinationDetails({ destination }: DestinationDetailsPr
   const [nearbyHotels, setNearbyHotels] = useState<Hotel[]>([])
   const [destinationImages, setDestinationImages] = useState<DestinationImage[]>([])
   const [isLoading, setIsLoading] = useState(true)
-
+  const [hotels, setHotels] = useState<Hotel[]>([])
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -44,17 +45,20 @@ export default function DestinationDetails({ destination }: DestinationDetailsPr
 
         setAverageRating(rating)
         setReviewCount(reviews.length)
-
+  
         // Tìm khách sạn gần đó
-        const nearby = await findNearbyHotels(
+        const [nearby,hotel_nearby] = await findNearbyHotels(
           destination.latitude,
           destination.longitude,
           hotels,
           30
         )
         setNearbyHotels(nearby)
+        setHotels(hotel_nearby)
+        console.log(hotel_nearby)
+        console.log(nearby)
         setDestinationImages(images)
-        
+     
       } catch (error) {
         console.error('Error fetching destination details:', error)
       } finally {
@@ -144,8 +148,8 @@ export default function DestinationDetails({ destination }: DestinationDetailsPr
           <div className="prose max-w-none">
             <p>
               {destination.name} is one of the most popular destinations in {destination.location}, attracting visitors
-              from all around the world. The ...
-              offers a unique experience that showcases the natural beauty and cultural heritage of Bali.
+              from all around the world. The {destination.type}
+              offers a unique experience that showcases the natural beauty and cultural heritage of {destination.location}.
             </p>
             <p className="mt-4">
               Visitors can easily reach {destination.name} via {destination.transportation.toLowerCase()}. The entry fee
@@ -154,9 +158,31 @@ export default function DestinationDetails({ destination }: DestinationDetailsPr
           </div>
         </Card>
 
-        {/* Nearby Hotels Carousel */}
+        {/* Hotels Section with Tabs */}
         <div className="mt-12">
-          <HotelCarousel hotels={nearbyHotels} title={`Hotels near ${destination.name} (${nearbyHotels.length})`} />
+          <Tabs defaultValue="recommended" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="recommended">Recommend Hotel</TabsTrigger>
+              <TabsTrigger value="all">View All Hotel</TabsTrigger>
+            </TabsList>
+            <TabsContent value="recommended">
+              <div className="mt-4">
+                <HotelCarousel
+                  hotels={nearbyHotels}
+                  title={`Recommended Hotels near ${destination.name} (${nearbyHotels.length})`}
+                />
+              </div>
+            </TabsContent>
+            <TabsContent value="all">
+              <div className="mt-4">
+                <HotelCarousel
+                  hotels={hotels}
+                  title={`All Hotels near ${destination.name} (${hotels.length})`}
+                />
+                {/* Bạn có thể thay thế HotelCarousel này bằng component khác cho View All Hotel sau này */}
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
 
         {/* Destination Reviews Section */}

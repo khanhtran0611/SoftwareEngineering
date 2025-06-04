@@ -14,6 +14,7 @@ import RoomCarousel from "@/components/room-carousel"
 import { getUserFromStorage } from "@/lib/auth"
 import { calculateAverageRating } from "@/lib/review2"
 import type { Hotel } from "@/types/hotel"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 type HotelDetailsProps = {
   hotel: Hotel
@@ -124,7 +125,7 @@ export default function HotelDetails({ hotel }: HotelDetailsProps) {
             <p>
               {hotel.name} is located in {hotel.address}, offering comfortable accommodations for travelers visiting
               Bali.{" "}
-              {averageRating !== null
+              {averageRating !== null && averageRating !== 0
                 ? `With a rating of ${averageRating.toFixed(1)} stars, this hotel provides excellent service and amenities for guests.`
                 : "This hotel provides excellent service and amenities for guests."}
             </p>

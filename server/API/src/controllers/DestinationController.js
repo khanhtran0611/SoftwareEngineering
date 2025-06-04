@@ -334,7 +334,6 @@ class DestinationController {
 
     async getDestinationRecommendations(req,res){
         try {
-            console.log(req.body)
             const { user_id } = req.body;
    
             // Validate user_id
@@ -344,11 +343,20 @@ class DestinationController {
                      message: "Missing user_id in request body",
                   });
             }
-   
             // Call Flask API to get recommended destinations
-            const response = await axios.post("http://localhost:5001/destination/recommend", {
-                  user_id,
-            });
+            let response;
+            try{
+                response = await axios.post("http://localhost:5001/destination/recommend", {
+                    user_id,
+              });
+            }catch(error){
+                console.error("Error when recommending :", error);
+                return res.status(500).json({
+                    status: 0,
+                    message: "Failed to fetch recommended destinations: " + error.message,
+                });
+            }
+
             
             const recommendedDestinationIds = response.data; // Array of destination IDs
    

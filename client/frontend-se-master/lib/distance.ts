@@ -37,8 +37,8 @@ export async function findNearbyHotels(
     console.log('User ID:', user?.user_id)
     console.log('Nearby hotelssss:', nearbyHotels)
     const response = await api.post('/api/hotels/rec_hotel', { user_id: user?.user_id, hotels: nearbyHotels })
-    console.log('Response:', response)
-    return response.data
+    console.log(response.data)
+    return [response.data,nearbyHotels]
   } catch (error) {
     console.error('Error sending nearby hotels:', error)
     throw error

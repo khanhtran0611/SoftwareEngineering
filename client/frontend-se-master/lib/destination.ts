@@ -132,13 +132,13 @@ export async function deleteDestinationImageonDB(imageId: number) {
 
 export const saveDestinationsToStorage = (destinations: Destination[]) => {
     if (typeof window !== "undefined") {
-        localStorage.setItem("travelDestinations", JSON.stringify(destinations))
+        localStorage.setItem("Rec_Destinations", JSON.stringify(destinations))
     }
 }
 
 export const getDestinationsFromStorage = (): Destination[] => {
     if (typeof window !== "undefined") {
-        const destinations = localStorage.getItem("travelDestinations")
+        const destinations = localStorage.getItem("Rec_Destinations")
         return destinations ? JSON.parse(destinations) : null
     }
     return []
@@ -146,7 +146,29 @@ export const getDestinationsFromStorage = (): Destination[] => {
 
 export const removeDestinationsFromStorage = () => {
     if (typeof window !== "undefined") {
-        localStorage.removeItem("travelDestinations")
+        localStorage.removeItem("Rec_Destinations")
         console.log("OKK")
     }
 }   
+
+export const saveAllDestinationsToStorage = (destinations: Destination[]) => {
+    if (typeof window !== "undefined") {
+        localStorage.setItem("All_Destinations", JSON.stringify(destinations))
+    }
+}
+
+export const getAllDestinationsFromStorage = (): Destination[] => {
+    if (typeof window !== "undefined") {
+        const destinations = localStorage.getItem("All_Destinations")
+        return destinations ? JSON.parse(destinations) : null
+    }
+    return []
+}   
+
+export const removeAllDestinationsFromStorage = () => {
+    if (typeof window !== "undefined") {
+        localStorage.removeItem("All_Destinations")
+    }
+}   
+
+

@@ -6,7 +6,7 @@ from NCF import NCF
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from torch.utils.data import DataLoader, TensorDataset
 class RecSysNCF:
-    def __init__(self, ratings_path="destination_review.csv", model_path="ncf_algo.pkl", embedding_dim=32, hidden_layers=[64, 32, 16, 8]):
+    def __init__(self, ratings_path="src/ai/dataset/destination_review.csv", model_path="ncf_algo.pkl", embedding_dim=32, hidden_layers=[64, 32, 16, 8]):
         self.ratings_path = ratings_path
         self.model_path = model_path
         self.embedding_dim = embedding_dim
@@ -17,6 +17,7 @@ class RecSysNCF:
 
     def _prepare_data(self):
         df = pd.read_csv(self.ratings_path)
+        df['rating'] = df['rating'].astype(int)
         self.user2idx = {user: idx for idx, user in enumerate(df['user_id'].unique())}
         self.item2idx = {item: idx for idx, item in enumerate(df['destination_id'].unique())}
         self.idx2item = {idx: item for item, idx in self.item2idx.items()}
@@ -113,8 +114,8 @@ class RecSysNCF:
 # if __name__ == "__main__":
 #     # Initialize the RecSysNCF class
 #     recsys = RecSysNCF(
-#         ratings_path="dataset/destination_review.csv",
-#         model_path="E:/SoftwareEngineering/server/API/src/ai/ncf_algo.pkl",
+#         ratings_path="C:/Users/ADMIN/Downloads/Destination_photo (1)/server/API/src/ai/dataset/destination_review.csv",
+#         model_path="C:/Users/ADMIN/Downloads/Destination_photo (1)/server/API/src/ai/ncf_algo.pkl",
 #         embedding_dim=32,
 #         hidden_layers=[64, 32, 16, 8]
 #     )
@@ -129,3 +130,4 @@ class RecSysNCF:
 #     print(f"Getting recommendations for user {user_id}...")
 #     recommendations = recsys.run(user_id=user_id)
 #     print(f"Top recommendations for user {user_id}: {recommendations}")
+

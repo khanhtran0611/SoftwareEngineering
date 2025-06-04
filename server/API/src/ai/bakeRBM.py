@@ -123,9 +123,9 @@ class RecSysMain:
         return recommendations
 
     def run(self, user_id=1, hotels=None):
-        if not os.path.exists(self.model_path):
-            self.train_and_save()
-        else:
-            self.load_model()
+        # if not os.path.exists(self.model_path):
+        #     self.train_and_save()
+        # else:
+        #     self.load_model()
+        self.train_and_save()
         return self.recommend(user_id, hotels)
-

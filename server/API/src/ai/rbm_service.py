@@ -4,17 +4,17 @@ from bakeNCF import RecSysNCF
 from export_csv import export_hotel_room_facilities_to_csv, export_review_user_hotel_rating, export_review_user_destination_rating
 
 # export_hotel_room_facilities_to_csv("C:/Users/ADMIN/Downloads/server/API/src/ai/dataset/hotel_room_facilities.csv")
-export_review_user_hotel_rating("C:/Users/ADMIN/Downloads/server/API/src/ai/dataset/ratings.csv")
-export_review_user_destination_rating("C:/Users/ADMIN/Downloads/server/API/src/ai/dataset/destination_review.csv")
+export_review_user_hotel_rating("C:/Users/ADMIN/Downloads/Destination_photo (1)/server/API/src/ai/dataset/ratings.csv")
+export_review_user_destination_rating("C:/Users/ADMIN/Downloads/Destination_photo (1)/server/API/src/ai/dataset/destination_review.csv")
 app = Flask(__name__)
-recsys = RecSysMain(ratings_path="C:/Users/ADMIN/Downloads/server/API/src/ai/dataset/ratings.csv")  # chỉ khởi tạo 1 lần
+recsys = RecSysMain(ratings_path="C:/Users/ADMIN/Downloads/Destination_photo (1)/server/API/src/ai/dataset/ratings.csv")  # chỉ khởi tạo 1 lần
 des_recsys = RecSysNCF(
-    ratings_path="C:/Users/ADMIN/Downloads/server/API/src/ai/dataset/destination_review.csv",  # Path to the dataset
-    model_path="C:/Users/ADMIN/Downloads/server/API/src/ai/ncf_algo.pkl",  # Path to the saved model
+    ratings_path="C:/Users/ADMIN/Downloads/Destination_photo (1)/server/API/src/ai/dataset/destination_review.csv",  # Path to the dataset
+    model_path="C:/Users/ADMIN/Downloads/Destination_photo (1)/server/API/src/ai/ncf_algo.pkl",  # Path to the saved model
     embedding_dim=32,
     hidden_layers=[64, 32, 16, 8]
 )  # Initialize the RecSysNCF class
-
+des_recsys.train_and_save()
 @app.route('/recommend', methods=['POST'])
 def recommend():
     data = request.get_json()

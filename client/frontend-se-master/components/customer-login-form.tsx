@@ -12,12 +12,12 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast"
 import { authenticateUser, saveUserToStorage } from "@/lib/auth"
-import { getDestinationRecommendations, saveDestinationsToStorage } from "@/lib/destination"
+import { getDestinationRecommendations, saveDestinationsToStorage, getAllDestinations, saveAllDestinationsToStorage } from "@/lib/destination"
 
 export default function CustomerLoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("customer@gmail.com") // Pre-filled with mock account
-  const [password, setPassword] = useState("123456") // Pre-filled with mock password
+  const [password, setPassword] = useState("pass123") // Pre-filled with mock password
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
@@ -33,6 +33,8 @@ export default function CustomerLoginForm() {
         saveUserToStorage(user)
         let destinations = await getDestinationRecommendations(user.user_id)
         saveDestinationsToStorage(destinations)
+        destinations = await getAllDestinations()
+        saveAllDestinationsToStorage(destinations)
         toast({
           title: "Login successful",
           description: `Welcome back, ${user.name}!`,

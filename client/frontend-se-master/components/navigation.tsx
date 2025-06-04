@@ -17,8 +17,8 @@ export default function Navigation() {
       icon: Home,
     },
     {
-      name: "Chatbot",
-      href: "/dashboard/chatbot",
+      name: "All Destinations",
+      href: "/dashboard/fulldestinations",
       icon: MessageSquare,
     },
     {

@@ -32,7 +32,7 @@ export default function HotelCard({ hotel }: HotelCardProps) {
           <h3 className="font-bold">{hotel.name}</h3>
           <p className="text-sm text-muted-foreground line-clamp-1">{hotel.address}</p>
           <div className="mt-2 flex items-center gap-1">
-            {averageRating !== null ? (
+            {averageRating !== null  && averageRating !== 0 ? (
               <>
                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                 <span className="text-sm font-medium">{averageRating}</span>

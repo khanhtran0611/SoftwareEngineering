@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { getUserFromStorage, removeUserFromStorage } from "@/lib/auth"
 import { formatVND } from "@/lib/currency"
-import { removeDestinationsFromStorage } from "@/lib/destination"
+import { removeDestinationsFromStorage, removeAllDestinationsFromStorage } from "@/lib/destination"
 
 type HeaderProps = {
   onSearch: (query: string) => void
@@ -72,6 +72,7 @@ export default function Header({ onSearch, onFilter }: HeaderProps) {
   const handleLogout = () => {
     removeUserFromStorage()
     removeDestinationsFromStorage()
+    removeAllDestinationsFromStorage()
     toast({
       title: "Logged out",
       description: "You have been successfully logged out.",
