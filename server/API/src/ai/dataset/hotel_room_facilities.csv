@@ -1,0 +1,21 @@
+hotel_id,room_names,HotelFacilities,FacilitiesPossessing
+1,Deluxe Room|Suite|Superior Room,Gym,"We offer a wonderful gym for you to experience . If you have something wrong, feel free to ask us"
+2,Economy Room|Family Room|Sea View Room,Swimming Pool,Outdoor swimming pool with relaxation area and lounge chairs.
+3,Business Room|Luxury Suite|Standard Room,Bar,Bar with a variety of drinks and a luxurious ambiance.
+4,Family Room|Standard Single Room,24/7 Reception,24/7 reception to assist with all guest needs.
+5,Family Room|Standard Single Room,Gym,Modern gym with full equipment.
+6,Executive Suite|Standard Single Room,,
+7,Deluxe Double Room|Executive Suite,"Free Wi-Fi, Parking Lot","High-speed internet access free throughout the hotel., Spacious, safe, and free parking for guests."
+8,Family Room|Standard Single Room,Swimming Pool,Outdoor swimming pool with relaxation area and lounge chairs.
+9,Deluxe Double Room|Family Room,"Free Wi-Fi, Laundry Service","Fast and convenient laundry service., High-speed internet access free throughout the hotel."
+10,Deluxe Double Room|Executive Suite|Standard Single Room,,
+11,Executive Suite|Standard Single Room,Gym,Modern gym with full equipment.
+12,Family Room|Standard Single Room,Airport Shuttle Service,Convenient and fast airport shuttle service.
+13,Executive Suite|Standard Single Room,,
+14,Deluxe Double Room|Standard Single Room,,
+15,Executive Suite|Standard Single Room,Gym,Modern gym with full equipment.
+16,Deluxe Double Room|Family Room,,
+17,Executive Suite,Restaurant,Restaurant serving local and international cuisine.
+18,Deluxe Double Room|Standard Single Room,Free Wi-Fi,High-speed internet access free throughout the hotel.
+19,Family Room|Standard Single Room,Swimming Pool,Outdoor swimming pool with relaxation area and lounge chairs.
+20,Executive Suite,,
