@@ -34,8 +34,10 @@ def recommend_destination():
     try:
         # Get top 10 recommended destinations for the user
         recommendations = des_recsys.run(user_id=user_id)
+        if recommendations == []:
+            return jsonify(recommendations)
         recommendations = [[int(destination_id)] for destination_id in recommendations[:10]]
-
+        print(recommendations)
         return jsonify(recommendations)
     except ValueError as e:
         return jsonify({"error": str(e)}), 400

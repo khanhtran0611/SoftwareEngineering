@@ -81,6 +81,7 @@ def GetAntiTestSetForUser(data, testSubject):
     fill = trainset.global_mean
     anti_testset = []
     u = trainset.to_inner_uid(str(testSubject))
+    print(u)
     user_items = set([j for (j, _) in trainset.ur[u]])
     anti_testset += [(trainset.to_raw_uid(u), trainset.to_raw_iid(i), fill) for
                                 i in trainset.all_items() if
@@ -94,6 +95,7 @@ class RecSysMain:
         self.reader = Reader(line_format='user item rating', sep=',', skip_lines=1)
         self.data = Dataset.load_from_file(self.ratings_path, reader=self.reader)
         self.algo = RBMAlgorithm(epochs=20, hiddenDim=10, learningRate=0.01, batchSize=10)
+        self.train_and_save()
 
     def train_and_save(self):
         trainset = self.data.build_full_trainset()
@@ -123,9 +125,8 @@ class RecSysMain:
         return recommendations
 
     def run(self, user_id=1, hotels=None):
-        # if not os.path.exists(self.model_path):
-        #     self.train_and_save()
-        # else:
-        #     self.load_model()
-        self.train_and_save()
+        if not os.path.exists(self.model_path):
+            self.train_and_save()
+        else:
+            self.load_model()
         return self.recommend(user_id, hotels)

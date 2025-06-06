@@ -95,7 +95,7 @@ class RecSysNCF:
     def recommend(self, user_id=1, destinations=None):
         user_idx = self.user2idx.get(user_id, None)
         if user_idx is None:
-            raise ValueError("Unknown user")
+            return []
         user_tensor = torch.tensor([user_idx] * self.num_items, dtype=torch.long).to(self.device)
         item_tensor = torch.arange(self.num_items, dtype=torch.long).to(self.device)
         with torch.no_grad():

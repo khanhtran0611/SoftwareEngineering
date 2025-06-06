@@ -137,12 +137,12 @@ export default function ReservationSuccessPage({ params }: { params: Promise<{ b
                 <div className="flex justify-between text-sm">
                   <span>Room rate</span>
                   <span>
-                    ${(booking.total_price / nights).toFixed(2)} × {nights} nights
+                    {(booking.total_price / nights).toFixed(2)} × {nights} nights (₫)
                   </span>
                 </div>
                 <div className="flex justify-between font-medium">
                   <span>Total amount</span>
-                  <span>${booking.total_price.toFixed(2)}</span>
+                  <span>{booking.total_price.toFixed(2)} (₫)</span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">* Payment will be collected at the property</p>
               </div>

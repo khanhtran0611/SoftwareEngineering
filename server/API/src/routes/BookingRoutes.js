@@ -13,4 +13,5 @@ router.get('/bookings/owner/:user_id',BookingController.ViewBooking)
 
 router.get('/check-booking-status/:room_id',BookingController.CheckBookingStatus)
 
-module.exports = router 
+module.exports = router
+ 

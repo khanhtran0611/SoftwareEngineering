@@ -165,6 +165,13 @@ export default function HotelOwnerBookingDetails({
                 </Button>
               </div>
             )}
+             {booking.status === "cancel requested" && (
+              <div className="flex gap-2">
+                <Button variant="default" onClick={() => onStatusChange(booking.booking_id, "cancelled")}>
+                  Cancel Booking
+                </Button>
+              </div>
+            )}
           </div>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close

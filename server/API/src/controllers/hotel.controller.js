@@ -142,8 +142,12 @@ class HotelController {
             }
             console.log(hotels)
             // Lấy danh sách hotel_id từ mảng hotels
+            let checks = await pool.query(queries.checkUserRating,[user_id])
+            if(checks.rows.length == 0){
+                return res.status(200).json({status : 1,data : hotels})
+            }
             const hotelIds = hotels.map(h => h.hotel_id);
-
+  
             // Gọi Flask API
             const response = await axios.post('http://localhost:5001/recommend', {
                 user_id,

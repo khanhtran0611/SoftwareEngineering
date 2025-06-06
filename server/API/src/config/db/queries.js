@@ -402,6 +402,10 @@ const checkBookingStatus = `
     SELECT * FROM Booking WHERE room_id = $1 AND status = 'accepted';
 `
 
+const checkUserRating =  `
+   SELECT * FROM review WHERE user_id = $1;
+`
+
 module.exports = {
     viewOrderHistory,
     updatePassword,
@@ -497,5 +501,6 @@ module.exports = {
     updateRoomStatus,
     updateDestinationRating,
     checkEmail,
-    checkBookingStatus
+    checkBookingStatus,
+    checkUserRating
 }

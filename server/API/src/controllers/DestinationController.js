@@ -349,6 +349,7 @@ class DestinationController {
                 response = await axios.post("http://localhost:5001/destination/recommend", {
                     user_id,
               });
+
             }catch(error){
                 console.error("Error when recommending :", error);
                 return res.status(500).json({
@@ -359,7 +360,15 @@ class DestinationController {
 
             
             const recommendedDestinationIds = response.data; // Array of destination IDs
-   
+            if(recommendedDestinationIds.length == 0){
+                pool.query(queries.getAllDestinations,(err, result) => {
+                    if(err){
+                        return res.status(500).json({status : 0, message : err.message})
+                    }
+                    return res.status(200).json({status : 1, data : result.rows})
+                })
+                return
+            }
             // Fetch detailed information for each recommended destination
             const destinations = await Promise.all(
                   recommendedDestinationIds.map(async (destination_id) => {

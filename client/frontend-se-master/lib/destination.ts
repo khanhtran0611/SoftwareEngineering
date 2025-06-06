@@ -95,7 +95,7 @@ export async function uploadDestinationImages(file: File) {
 
 export async function deleteDestinationImage(filename: string) {
     try {
-        const response = await api.delete(`/destinations/delete-destination-image/${filename.replace('/destination/', '')}`)
+        const response = await api.delete(`/destinations/delete-destination-image/${filename.substring(14)}`)
         return response
     } catch (error) {
         throw error
